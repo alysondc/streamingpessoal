@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Streaming Pessoal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        
+        header {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .shows-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .show-card {
+            width: 20%;
+            min-width: 200px;
+            margin-bottom: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .show-card img {
+            width: 100%;
+            border-radius: 8px;
+            height: 280px;
+            object-fit: cover;
+        }
+        
+        .show-card h3 {
+            margin-top: 10px;
+            background-color: #0818ff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .show-card h3:hover {
+            background-color: #00ff4c;
+            transform: translateY(-2px) scale(1.05);  
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Meu Streaming Pessoal</h1>
+    </header>
+    
+    <div class="container">
+        <div class="shows-container">
+            <!-- Família da Pesada -->
+            <div class="show-card" onclick="window.location.href='family-guy.html'">
+                <img src="https://imgs.search.brave.com/XcPTnmvhlu5NKjz5X6i7URlUcWM2uijoQYmDQFJ-sBM/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL00v/TVY1Qk5UWmxNR1Ex/WWpFdE16VmxOQzAw/Wm1NeExUazBNemd0/Wmpka1lUVTFObVV4/TlRRMFhrRXlYa0Zx/Y0djQC5qcGc" alt="Família da Pesada">
+                <h3>Família da Pesada</h3>
+            </div>
+                        
+            <!-- American Dad -->
+            <div class="show-card" onclick="window.location.href='american dad.html'">
+                <img src="https://imgs.search.brave.com/ke0jJJO1i31KE0PVb-Ezwo5Z2Rh2prsLedYiX21bpoI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzllLzI0/LzA4LzllMjQwOGQ5/Mzg0YWNlOTdiNWY2/Y2NkZmMwY2ViMzc1/LmpwZw" alt="American Dad">
+                <h3>American Dad</h3>
+            </div>
+            
+            <!-- Rick and Morty -->
+            <div class="show-card" onclick="window.location.href='rick-and-morty.html'">
+                <img src="https://imgs.search.brave.com/yt45drRrrTJ5Dl3JDBCZmIYWsNjfgZIppAMAf45SWX8/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJzLmNvbS9p/bWFnZXMvZmVhdHVy/ZWQvcmljay1hbmQt/bW9ydHktOHJjNTdk/NGRzNDRncXphdS5q/cGc" alt="Rick and Morty">
+                <h3>Rick and Morty</h3>
+            </div>
+            
+            <!-- South Park -->
+            <div class="show-card" onclick="window.location.href='south-park.html'">
+                <img src="https://imgs.search.brave.com/KV5d9o2khfo5l5uxBXBZRE5Ct1DW8tg8C-PdIy4BRZE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL00v/TVY1Qk5EWXdOamt4/TVRBdFpEYzNZaTAw/TldJMUxUZzRaVFl0/TWpJeE9UWTJOV1F5/TlRVM1hrRXlYa0Zx/Y0djQC5qcGc" alt="South Park">
+                <h3>South Park</h3>
+            </div>
+            
+            <!-- Hajime no Ippo -->
+            <div class="show-card" onclick="window.location.href='hajime no ippo.html'">
+                <img src="https://imgs.search.brave.com/hqdCp7bwfzZQkQ1UAJoafml_GawlbWj-I02haH5lwLw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tLm1l/ZGlhLWFtYXpvbi5j/b20vaW1hZ2VzL00v/TVY1Qk4yVXpNbU01/TlRRdFlqVXhZeTAw/T1dWakxUa3dPV010/WXpGaE9HUXhOMlZs/WmpJNVhrRXlYa0Zx/Y0djQC5qcGc" alt="Hajime no Ippo">
+                <h3>Hajime no Ippo</h3>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

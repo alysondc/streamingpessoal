@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hajime no Ippo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    header {
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #333333;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .video-player {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: auto;
+    }
+
+    #player {
+      width: 100%;
+      height: 540px;
+    }
+
+    /* Botão de próximo episódio */
+    .next-episode-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(255, 69, 0, 0.9);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      display: none;
+      z-index: 1000;
+      animation: pulse 2s infinite;
+      box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+    }
+
+    .next-episode-button:hover {
+      background-color: rgba(255, 69, 0, 1);
+      transform: scale(1.05);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Placeholder quando nenhum vídeo está carregado */
+    .video-placeholder {
+      width: 100%;
+      height: 540px;
+      background-color: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      border: 2px dashed #444;
+    }
+
+    .video-placeholder h3 {
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .video-placeholder p {
+      color: #888;
+      text-align: center;
+      margin: 0;
+    }
+
+    .episode-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .episode-item {
+      background-color: #1a1a1a;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .episode-item:hover {
+      background-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .episode-item.active {
+      background-color: #444;
+      border: 2px solid #ff4500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hajime no Ippo</h1>
+  </header>
+  <div class="container">
+
+    <a href="index.html" class="back-button">Voltar</a>
+
+    <div class="video-player">
+      <div id="player-container">
+        <div id="video-placeholder" class="video-placeholder">
+          <h3>🥊 Hajime no Ippo</h3>
+          <p>Clique em um episódio abaixo para começar a assistir</p>
+        </div>
+      </div>
+      <button id="next-episode-btn" class="next-episode-button">
+        Próximo Episódio ⏭️
+      </button>
+    </div>
+    
+    <div class="episodes-container">
+      <h2 style="text-align:center">Episódios</h2>
+      <div id="episode-list" class="episode-list"></div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    const hajimeEpisodes = [
+      'D-fZXsPGBRk', '7GzaiBM6818', '-i2yGBdsUXc', 'gtFEBxR8FXk', '02mMdz0KPYE',
+      'jcInLVJSXp8', 'MijwOfdyxCg', 'VBfPjEnvRrA', 'YMzZ-ZosW1w', 'cNx-We0QanM',
+      'DT09OE5-4vc', 'uX2W0P9Anpk', 'LqFcod-U8j8', 'Z_z-vDTXQeA', 'kClT53Q_kkk',
+      'ne8AYLOkNYA', 'TqEmZf44B-4', 'b6a6ymT7Brk', 'spifN6a83PM', '7xhuWcWK3qA',
+      'wB0_0OOTHVs', '4h3DGnYznzI', 'XbG7G8zebqA', 'j3UYPWXUhi0', '5CNp1n8ARkU',
+      'gDxaa6aYTCE', 'PZ6BFQer2CQ', 'k01gEixEO_E', 'RsCG1z7nICk', 't6AuAHNso8I',
+      'aVt2iYdifME', 'CPNNoiUoop8', 'CRlFZlqXTRQ', 'XADivngjyBk', '_3NvDLwYBmI',
+      '9fcrUnqNHhA', 'lPr8oH6pGVk', 'Jv918Uy2vwQ', 'DnPGkrMCkpQ', '0pTAOETVfVI',
+      'LMr_B6JHZyk', 'nFlAjrpJCs0', 'in3a4vV0Tr4', 'RZV1HhHngHg', 'B6VPR7kKDfI',
+      'yDfuAKsNEXQ', 'IotTjHwctm0', 'F5yRYBuTwnw', '0LDgg9NjiHQ', 'D-fkYFCxi9Y',
+      'UXtzEaa5UNM', 'oq9cScc8X8o', '3-FDPsrTCqY', 'c228BpR9O2U', 'k4B3Vxcnfgw',
+      '5EIjq4cctbQ', 'IHXRLWckoXk', 'TyNV3itSdlA', 'b7eILv9lzLk', 'Je7UzL6SwT4',
+      '1XWUE895q_k', 'B5F1z5EqGTY', 'VjP2OCITQtE', 'SmtaglKjyHs', 'XbwF_kzCP1E',
+      'UJrsXKIyRwM', 'SrKT16O8ZWw', 'm6XBQ_b5unY', '02TMG2YPZOQ', 'CLOnReJK_w4',
+      'K-RyRCjyERg', 'G_bdV-YxrKA', 'JO-Wk3wPh2Q', 'V-zC__HMzxY', 'TT5aR1vrP6M'
+    ];
+
+    let currentEpisode = -1; // Começa sem episódio carregado
+    let player;
+    let timeCheckInterval;
+    let nextEpisodeShown = false;
+    let autoSkipTimer;
+
+    // YouTube API callback
+    function onYouTubeIframeAPIReady() {
+      // Não carrega nenhum vídeo automaticamente
+      createEpisodeList();
+    }
+
+    function initializePlayer(videoId) {
+      // Remove o placeholder
+      const placeholder = document.getElementById('video-placeholder');
+      if (placeholder) {
+        placeholder.remove();
+      }
+
+      // Cria o player
+      const container = document.getElementById('player-container');
+      container.innerHTML = '<div id="player"></div>';
+
+      player = new YT.Player('player', {
+        height: '540',
+        width: '960',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          rel: 0,
+          fs: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+      highlightEpisode(currentEpisode);
+      startTimeCheck();
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        hideNextEpisodeButton();
+        playNextEpisode();
+      } else if (event.data === YT.PlayerState.PLAYING) {
+        startTimeCheck();
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        stopTimeCheck();
+      }
+    }
+
+    function startTimeCheck() {
+      if (timeCheckInterval) {
+        clearInterval(timeCheckInterval);
+      }
+
+      nextEpisodeShown = false;
+      
+      timeCheckInterval = setInterval(() => {
+        if (player && player.getCurrentTime && player.getDuration) {
+          const currentTime = player.getCurrentTime();
+          const duration = player.getDuration();
+          
+          if (duration > 0) {
+            const timeRemaining = duration - currentTime;
+            
+            // Mostra o botão quando faltam 1:45 (105 segundos)
+            if (timeRemaining <= 105 && timeRemaining > 95 && !nextEpisodeShown) {
+              showNextEpisodeButton();
+              nextEpisodeShown = true;
+              
+              // Define timer para pular automaticamente quando faltam 1:35 (95 segundos)
+              autoSkipTimer = setTimeout(() => {
+                if (document.getElementById('next-episode-btn').style.display !== 'none') {
+                  playNextEpisode();
+                }
+              }, 10000); // 10 segundos depois (quando faltam 1:35)
+            }
+            
+            // Esconde o botão se o usuário voltar o vídeo
+            if (timeRemaining > 105 && nextEpisodeShown) {
+              hideNextEpisodeButton();
+              nextEpisodeShown = false;
+              if (autoSkipTimer) {
+                clearTimeout(autoSkipTimer);
+              }
+            }
+          }
+        }
+      }, 1000);
+    }
+
+    function stopTimeCheck() {
+      if (timeCheckInterval) {
+        clearInterval(timeCheckInterval);
+      }
+      if (autoSkipTimer) {
+        clearTimeout(autoSkipTimer);
+      }
+    }
+
+    function showNextEpisodeButton() {
+      const button = document.getElementById('next-episode-btn');
+      if (currentEpisode < hajimeEpisodes.length - 1) {
+        button.style.display = 'block';
+      }
+    }
+
+    function hideNextEpisodeButton() {
+      const button = document.getElementById('next-episode-btn');
+      button.style.display = 'none';
+      if (autoSkipTimer) {
+        clearTimeout(autoSkipTimer);
+      }
+    }
+
+    function playEpisode(index) {
+      currentEpisode = index;
+      
+      if (!player) {
+        // Primeira vez - inicializa o player
+        initializePlayer(hajimeEpisodes[index]);
+      } else {
+        // Player já existe - só carrega novo vídeo
+        player.loadVideoById(hajimeEpisodes[index]);
+        highlightEpisode(index);
+        hideNextEpisodeButton();
+        nextEpisodeShown = false;
+        startTimeCheck();
+      }
+    }
+
+    function playNextEpisode() {
+      console.log('🔄 EXECUTANDO playNextEpisode');
+      if (currentEpisode < hajimeEpisodes.length - 1) {
+        hideNextEpisodeButton();
+        
+        // Limpa timers antes de trocar episódio
+        if (autoSkipTimer) {
+          clearTimeout(autoSkipTimer);
+          autoSkipTimer = null;
+        }
+        if (timeCheckInterval) {
+          clearInterval(timeCheckInterval);
+          timeCheckInterval = null;
+        }
+        
+        playEpisode(currentEpisode + 1);
+      }
+    }
+
+    function highlightEpisode(index) {
+      document.querySelectorAll('.episode-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
+
+    // Criar lista de episódios
+    function createEpisodeList() {
+      const list = document.getElementById('episode-list');
+      hajimeEpisodes.forEach((_, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'episode-item';
+        btn.textContent = `Episódio ${i + 1}`;
+        btn.addEventListener('click', () => playEpisode(i));
+        list.appendChild(btn);
+      });
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      const nextBtn = document.getElementById('next-episode-btn');
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        hideNextEpisodeButton();
+        playNextEpisode();
+      });
+
+      const skipBtn = document.getElementById('skip-intro-btn');
+      skipBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        skipIntro();
+      });
+
+      // NOVO botão skip
+      const newSkipBtn = document.getElementById('skip-intro-new');
+      newSkipBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🚀 NOVO botão clicado - executando skip');
+        if (player && player.seekTo) {
+          player.seekTo(80, true); // Pula para 1:20
+          newSkipBtn.style.display = 'none'; // Esconde o botão
+          console.log('✅ Skip executado - pulado para 1:20');
+        }
+      });
+
+      // Para dispositivos touch
+      skipBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        skipIntro();
+      });
+
+      nextBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        hideNextEpisodeButton();
+        playNextEpisode();
+      });
+
+      // Monitora mudanças no modo fullscreen para ajustar os botões
+      document.addEventListener('fullscreenchange', adjustButtonPosition);
+      document.addEventListener('webkitfullscreenchange', adjustButtonPosition);
+      document.addEventListener('mozfullscreenchange', adjustButtonPosition);
+      document.addEventListener('msfullscreenchange', adjustButtonPosition);
+      
+      // Monitora rotação de tela em dispositivos móveis
+      window.addEventListener('orientationchange', () => {
+        setTimeout(adjustButtonPosition, 500);
+      });
+      
+      // Monitora redimensionamento de janela
+      window.addEventListener('resize', adjustButtonPosition);
+    });
+
+    function adjustButtonPosition() {
+      const button = document.getElementById('next-episode-btn');
+      if (button.style.display === 'block') {
+        showNextEpisodeButton(); // Reajusta a posição
+      }
+    }
+  </script>
+</body>
+</html>

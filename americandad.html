@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>American Dad - Meu Streaming Pessoal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        
+        header {
+            background-color: #000000;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .back-button:hover {
+            background-color: #555;
+        }
+        
+        .video-player {
+            width: 100%;
+            margin: 20px 0;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .episodes-container {
+            margin-top: 30px;
+        }
+        
+        .season-selector {
+            margin-bottom: 20px;
+        }
+        
+        .season-btn {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .season-btn.active {
+            background-color: #0818ff;
+        }
+        
+        .season-btn:hover {
+            background-color: #555;
+        }
+        
+        .season-btn.active:hover {
+            background-color: #00ff4c;
+        }
+        
+        .episode-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .episode-item {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .episode-item:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+        
+        .episode-item.current {
+            background-color: #444;
+            font-weight: bold;
+            border-color: #0818ff;
+        }
+        
+        .episode-item h4 {
+            color: #0818ff;
+            margin-bottom: 5px;
+        }
+        
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .video-controls {
+            padding: 15px;
+            background-color: #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            padding: 8px 15px;
+            background-color: #0818ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .control-btn:hover {
+            background-color: #00ff4c;
+        }
+        
+        .control-btn:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .episode-info {
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        
+        .autoplay-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px;
+        }
+        
+        .autoplay-toggle {
+            background-color: transparent;
+            border: 2px solid #0818ff;
+            color: #0818ff;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .autoplay-toggle.active {
+            background-color: #0818ff;
+            color: white;
+        }
+        
+        /* Overlay do próximo episódio */
+        .next-episode-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #0818ff;
+            display: none;
+            z-index: 1000;
+            min-width: 200px;
+        }
+        
+        .next-episode-overlay.show {
+            display: block;
+        }
+        
+        .countdown-timer {
+            color: #00ff4c;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .next-episode-info {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .skip-btn {
+            background-color: #0818ff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .skip-btn:hover {
+            background-color: #00ff4c;
+        }
+        
+        .cancel-btn {
+            background-color: #666;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #999;
+        }
+        
+        /* Responsivo para celular */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            iframe {
+                height: 250px;
+            }
+            
+            .episode-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .control-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .next-episode-overlay {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>American Dad</h1>
+    </header>
+    
+    <div class="container">
+        <a href="index.html" class="back-button">Voltar</a>
+        
+        <div id="video-player" class="video-player">
+            <div id="video-frame">
+                <!-- O iframe será inserido aqui via JavaScript -->
+            </div>
+            
+            <!-- Overlay do próximo episódio -->
+            <div id="next-episode-overlay" class="next-episode-overlay">
+                <div id="countdown-timer" class="countdown-timer">30s</div>
+                <div id="next-episode-info" class="next-episode-info">
+                    Próximo episódio começará em breve...
+                </div>
+                <div>
+                    <button class="skip-btn" onclick="skipToNext()">Pular Agora</button>
+                    <button class="cancel-btn" onclick="cancelAutoplay()">Cancelar</button>
+                </div>
+            </div>
+            
+            <div class="video-controls">
+                <button class="control-btn" id="prev-btn" onclick="playPreviousEpisode()">⏮ Anterior</button>
+                
+                <div class="episode-info">
+                    <span id="current-episode-info">Selecione um episódio</span>
+                </div>
+                
+                <div class="autoplay-controls">
+                    <button class="autoplay-toggle" id="autoplay-toggle" onclick="toggleAutoplay()">
+                        Auto-Play OFF
+                    </button>
+                </div>
+                
+                <button class="control-btn" id="next-btn" onclick="playNextEpisode()">Próximo ⏭</button>
+            </div>
+        </div>
+        
+        <div class="episodes-container">
+            <div class="season-selector">
+                <button class="season-btn active" onclick="showSeason(10)">Temporada 10</button>
+            </div>
+            
+            <h2 id="season-title">Episódios - Temporada 10</h2>
+            
+            <!-- Temporada 10 -->
+            <div id="season-10" class="episode-list">
+                <div class="episode-item" onclick="playEpisode(0, 10, 1)">
+                    <h4>T10 E01</h4>
+                    <p>Episódio 1 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(1, 10, 2)">
+                    <h4>T10 E02</h4>
+                    <p>Episódio 2 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(2, 10, 3)">
+                    <h4>T10 E03</h4>
+                    <p>Episódio 3 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(3, 10, 4)">
+                    <h4>T10 E04</h4>
+                    <p>Episódio 4 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(4, 10, 5)">
+                    <h4>T10 E05</h4>
+                    <p>Episódio 5 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(5, 10, 6)">
+                    <h4>T10 E06</h4>
+                    <p>Episódio 6 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(6, 10, 7)">
+                    <h4>T10 E07</h4>
+                    <p>Episódio 7 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(7, 10, 8)">
+                    <h4>T10 E08</h4>
+                    <p>Episódio 8 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(8, 10, 9)">
+                    <h4>T10 E09</h4>
+                    <p>Episódio 9 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(9, 10, 10)">
+                    <h4>T10 E10</h4>
+                    <p>Episódio 10 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(10, 10, 11)">
+                    <h4>T10 E11</h4>
+                    <p>Episódio 11 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(11, 10, 12)">
+                    <h4>T10 E12</h4>
+                    <p>Episódio 12 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(12, 10, 13)">
+                    <h4>T10 E13</h4>
+                    <p>Episódio 13 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(13, 10, 14)">
+                    <h4>T10 E14</h4>
+                    <p>Episódio 14 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(14, 10, 15)">
+                    <h4>T10 E15</h4>
+                    <p>Episódio 15 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(15, 10, 16)">
+                    <h4>T10 E16</h4>
+                    <p>Episódio 16 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(16, 10, 17)">
+                    <h4>T10 E17</h4>
+                    <p>Episódio 17 - Temporada 10</p>
+                </div>
+                <div class="episode-item" onclick="playEpisode(17, 10, 18)">
+                    <h4>T10 E18</h4>
+                    <p>Episódio 18 - Temporada 10</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URLs dos episódios - Temporada 10
+        const episodes = [
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT10EP01',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT10EP02',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT10EP03',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP01',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP02',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP03',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP04',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP05',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP06',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP07',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP08',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP09',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP10',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP11',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP12',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP13',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP14',
+            'https://redecanais.gd/player3/server.php?server=RCServer09&subfolder=ondemand&vid=AMRCDDT11EP15'
+        ];
+
+        let currentEpisodeIndex = -1;
+        let currentSeason = 10;
+        let autoPlayEnabled = false;
+        let autoplayTimer = null;
+        let countdownTimer = null;
+        let episodeDuration = 22 * 60; // 22 minutos em segundos (média do American Dad)
+        let timeToShowOverlay = 30; // 30 segundos antes do fim
+
+        // Função para alternar auto-play
+        function toggleAutoplay() {
+            autoPlayEnabled = !autoPlayEnabled;
+            const toggleBtn = document.getElementById('autoplay-toggle');
+            
+            if (autoPlayEnabled) {
+                toggleBtn.textContent = 'Auto-Play ON';
+                toggleBtn.classList.add('active');
+                
+                // Se já estiver reproduzindo um episódio, configurar o timer
+                if (currentEpisodeIndex >= 0) {
+                    setupAutoplayTimer();
+                }
+            } else {
+                toggleBtn.textContent = 'Auto-Play OFF';
+                toggleBtn.classList.remove('active');
+                clearAutoplayTimers();
+            }
+        }
+
+        // Função para configurar timer de auto-play
+        function setupAutoplayTimer() {
+            if (!autoPlayEnabled) return;
+            
+            clearAutoplayTimers();
+            
+            // Calcular quando mostrar o overlay (episodeDuration - 30 segundos)
+            const timeToShowOverlayMs = (episodeDuration - timeToShowOverlay) * 1000;
+            
+            autoplayTimer = setTimeout(() => {
+                showNextEpisodeOverlay();
+            }, timeToShowOverlayMs);
+        }
+
+        // Função para mostrar overlay do próximo episódio
+        function showNextEpisodeOverlay() {
+            if (currentEpisodeIndex >= episodes.length - 1) {
+                return; // Não há próximo episódio
+            }
+            
+            const overlay = document.getElementById('next-episode-overlay');
+            const nextEpisodeInfo = document.getElementById('next-episode-info');
+            const nextIndex = currentEpisodeIndex + 1;
+            const nextEpisodeNum = nextIndex + 1;
+            
+            nextEpisodeInfo.textContent = `Próximo: T10 E${nextEpisodeNum.toString().padStart(2, '0')}`;
+            overlay.classList.add('show');
+            
+            startCountdown();
+        }
+
+        // Função para iniciar countdown
+        function startCountdown() {
+            let seconds = timeToShowOverlay;
+            const countdownElement = document.getElementById('countdown-timer');
+            
+            countdownElement.textContent = `${seconds}s`;
+            
+            countdownTimer = setInterval(() => {
+                seconds--;
+                countdownElement.textContent = `${seconds}s`;
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownTimer);
+                    skipToNext();
+                }
+            }, 1000);
+        }
+
+        // Função para pular para o próximo episódio
+        function skipToNext() {
+            clearAutoplayTimers();
+            hideNextEpisodeOverlay();
+            playNextEpisode();
+        }
+
+        // Função para cancelar auto-play
+        function cancelAutoplay() {
+            clearAutoplayTimers();
+            hideNextEpisodeOverlay();
+        }
+
+        // Função para esconder overlay
+        function hideNextEpisodeOverlay() {
+            document.getElementById('next-episode-overlay').classList.remove('show');
+        }
+
+        // Função para limpar timers
+        function clearAutoplayTimers() {
+            if (autoplayTimer) {
+                clearTimeout(autoplayTimer);
+                autoplayTimer = null;
+            }
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            hideNextEpisodeOverlay();
+        }
+
+        function showSeason(season) {
+            currentSeason = season;
+            
+            // Atualizar botões ativos
+            document.querySelectorAll('.season-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mostrar/esconder listas de episódios
+            document.getElementById('season-10').classList.add('hidden');
+            if(document.getElementById('season-11')) {
+                document.getElementById('season-11').classList.add('hidden');
+            }
+            document.getElementById(`season-${season}`).classList.remove('hidden');
+            
+            // Atualizar título
+            document.getElementById('season-title').textContent = `Episódios - Temporada ${season}`;
+        }
+
+        // Função para reproduzir episódio
+        function playEpisode(index, season, episode) {
+            currentEpisodeIndex = index;
+            const videoFrame = document.getElementById('video-frame');
+            
+            // Limpar timers anteriores
+            clearAutoplayTimers();
+            
+            // Limpar player atual
+            videoFrame.innerHTML = '';
+            
+            // Criar novo iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = episodes[index];
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            iframe.allow = 'encrypted-media';
+            iframe.style.width = '100%';
+            iframe.style.height = window.innerWidth <= 768 ? '250px' : '500px';
+            
+            videoFrame.appendChild(iframe);
+            
+            // Atualizar informações do episódio
+            document.getElementById('current-episode-info').textContent = `Temporada ${season} - Episódio ${episode}`;
+            
+            // Marcar episódio atual
+            markCurrentEpisode(index, season);
+            
+            // Atualizar botões de controle
+            updateControlButtons();
+            
+            // Configurar auto-play se estiver habilitado
+            if (autoPlayEnabled) {
+                setupAutoplayTimer();
+            }
+        }
+
+        // Função para marcar episódio atual
+        function markCurrentEpisode(index, season) {
+            // Remover marcação anterior
+            document.querySelectorAll('.episode-item').forEach(item => {
+                item.classList.remove('current');
+            });
+            
+            // Marcar episódio atual
+            const seasonDiv = document.getElementById(`season-${season}`);
+            const episodeItems = seasonDiv.querySelectorAll('.episode-item');
+            
+            if (episodeItems[index]) {
+                episodeItems[index].classList.add('current');
+            }
+        }
+
+        // Função para atualizar botões de controle
+        function updateControlButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentEpisodeIndex <= 0;
+            nextBtn.disabled = currentEpisodeIndex >= episodes.length - 1;
+        }
+
+        // Função para próximo episódio
+        function playNextEpisode() {
+            if (currentEpisodeIndex < episodes.length - 1) {
+                const nextIndex = currentEpisodeIndex + 1;
+                const episode = nextIndex + 1;
+                
+                playEpisode(nextIndex, 10, episode);
+            }
+        }
+
+        // Função para episódio anterior
+        function playPreviousEpisode() {
+            if (currentEpisodeIndex > 0) {
+                const prevIndex = currentEpisodeIndex - 1;
+                const episode = prevIndex + 1;
+                
+                playEpisode(prevIndex, 10, episode);
+            }
+        }
+
+        // Responsividade para orientação do celular
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                const iframe = document.querySelector('#video-frame iframe');
+                if (iframe) {
+                    iframe.style.height = window.innerWidth <= 768 ? '250px' : '500px';
+                }
+            }, 100);
+        });
+
+        // Detecção de redimensionamento da janela
+        window.addEventListener('resize', function() {
+            const iframe = document.querySelector('#video-frame iframe');
+            if (iframe) {
+                iframe.style.height = window.innerWidth <= 768 ? '250px' : '500px';
+            }
+        });
+
+        // Limpar timers quando a página for fechada
+        window.addEventListener('beforeunload', function() {
+            clearAutoplayTimers();
+        });
+    </script>
+</body>
+</html>
