@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hajime no Ippo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+    }
+
+    header {
+      background-color: #222;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+
+    .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #333333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-bottom: 20px;}
+
+
+
+
+    .video-player {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      margin: auto;
+    }
+
+    #player {
+      width: 100%;
+      height: 540px;
+    }
+
+    .episode-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .episode-item {
+      background-color: #1a1a1a;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .episode-item:hover {
+      background-color: #333;
+    }
+
+    .episode-item.active {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hajime no Ippo</h1>
+  </header>
+  <div class="container">
+
+    <a href="index.html" class="back-button">Voltar</a>
+
+    <div class="video-player">
+  
+      <div id="player"></div>
+    </div>
+    <div class="episodes-container">
+      <h2 style="text-align:center">Episódios</h2>
+      <div id="episode-list" class="episode-list"></div>
+    </div>
+  </div>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <script>
+    const hajimeEpisodes = [
+      'D-fZXsPGBRk', '7GzaiBM6818', '-i2yGBdsUXc', 'gtFEBxR8FXk', '02mMdz0KPYE',
+      'jcInLVJSXp8', 'MijwOfdyxCg', 'VBfPjEnvRrA', 'YMzZ-ZosW1w', 'cNx-We0QanM',
+      'DT09OE5-4vc', 'uX2W0P9Anpk', 'LqFcod-U8j8', 'Z_z-vDTXQeA', 'kClT53Q_kkk',
+      'ne8AYLOkNYA', 'TqEmZf44B-4', 'b6a6ymT7Brk', 'spifN6a83PM', '7xhuWcWK3qA',
+      'wB0_0OOTHVs', '4h3DGnYznzI', 'XbG7G8zebqA', 'j3UYPWXUhi0', '5CNp1n8ARkU',
+      'gDxaa6aYTCE', 'PZ6BFQer2CQ', 'k01gEixEO_E', 'RsCG1z7nICk', 't6AuAHNso8I',
+      'aVt2iYdifME', 'CPNNoiUoop8', 'CRlFZlqXTRQ', 'XADivngjyBk', '_3NvDLwYBmI',
+      '9fcrUnqNHhA', 'lPr8oH6pGVk', 'Jv918Uy2vwQ', 'DnPGkrMCkpQ', '0pTAOETVfVI',
+      'LMr_B6JHZyk', 'nFlAjrpJCs0', 'in3a4vV0Tr4', 'RZV1HhHngHg', 'B6VPR7kKDfI',
+      'yDfuAKsNEXQ', 'IotTjHwctm0', 'F5yRYBuTwnw', '0LDgg9NjiHQ', 'D-fkYFCxi9Y',
+      'UXtzEaa5UNM', 'oq9cScc8X8o', '3-FDPsrTCqY', 'c228BpR9O2U', 'k4B3Vxcnfgw',
+      '5EIjq4cctbQ', 'IHXRLWckoXk', 'TyNV3itSdlA', 'b7eILv9lzLk', 'Je7UzL6SwT4',
+      '1XWUE895q_k', 'B5F1z5EqGTY', 'VjP2OCITQtE', 'SmtaglKjyHs', 'XbwF_kzCP1E',
+      'UJrsXKIyRwM', 'SrKT16O8ZWw', 'm6XBQ_b5unY', '02TMG2YPZOQ', 'CLOnReJK_w4',
+      'K-RyRCjyERg', 'G_bdV-YxrKA', 'JO-Wk3wPh2Q', 'V-zC__HMzxY', 'TT5aR1vrP6M'
+    ];
+
+    let currentEpisode = 0;
+    let player;
+
+    // YouTube API callback
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '540',
+        width: '960',
+        videoId: hajimeEpisodes[currentEpisode],
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          rel: 0,
+          fs: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+      highlightEpisode(currentEpisode);
+    }
+
+    function onPlayerStateChange(event) {
+      // Estado 0 = vídeo terminou
+      if (event.data === YT.PlayerState.ENDED) {
+        playNextEpisode();
+      }
+    }
+
+    function playEpisode(index) {
+      currentEpisode = index;
+      player.loadVideoById(hajimeEpisodes[index]);
+      highlightEpisode(index);
+    }
+
+    function playNextEpisode() {
+      currentEpisode = (currentEpisode + 1) % hajimeEpisodes.length;
+      playEpisode(currentEpisode);
+    }
+
+    function highlightEpisode(index) {
+      document.querySelectorAll('.episode-item').forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+      });
+    }
+
+    // Criar lista de episódios
+    document.addEventListener('DOMContentLoaded', () => {
+      const list = document.getElementById('episode-list');
+      hajimeEpisodes.forEach((_, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'episode-item';
+        btn.textContent = `Episódio ${i + 1}`;
+        btn.addEventListener('click', () => playEpisode(i));
+        list.appendChild(btn);
+      });
+    });
+  </script>
+</body>
+</html>
